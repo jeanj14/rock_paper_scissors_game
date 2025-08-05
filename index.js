@@ -5,7 +5,7 @@ function playSingleRound(playerSelection, computerSelection) {
   if (player === computer) {
     return {
       result: "tie",
-      message: ` It's a tie! You both chose ${capitalize(player)}.`
+      message: `🤝 It's a tie! You both chose ${capitalize(player)}.`
     };
   }
 
@@ -28,11 +28,9 @@ function playSingleRound(playerSelection, computerSelection) {
   }
 }
 
-
 function capitalize(word) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
-
 
 function getComputerChoice() {
   const options = ['rock', 'paper', 'scissors'];
@@ -41,63 +39,41 @@ function getComputerChoice() {
 }
 
 
-function game() {
-  alert(" Welcome, human. You are Earth’s last hope against the Evil AI.\n\nDefeat it in a 5-round Rock, Paper, Scissors battle!\n\nInstructions:\n✔️ Type 'Rock', 'Paper', or 'Scissors'\n✔️ Invalid inputs don’t count\n✔️ First to win the most rounds saves the world!");
+let playerScore = 0;
+let computerScore = 0;
+let gameOver = false;
 
-  let playerScore = 0;
-  let computerScore = 0;
-  let validRounds = 0;
+const resultDiv = document.getElementById('result');
+const scoreDiv = document.getElementById('score');
+const finalDiv = document.getElementById('final');
 
-  while (validRounds < 5) {
-    const roundNumber = validRounds + 1;
-    let input = prompt(` Round ${roundNumber} - Choose Rock, Paper, or Scissors:`);
+document.getElementById('rock').addEventListener('click', () => playUIRound('rock'));
+document.getElementById('paper').addEventListener('click', () => playUIRound('paper'));
+document.getElementById('scissors').addEventListener('click', () => playUIRound('scissors'));
+document.getElementById('exit').addEventListener('click', exitGame); 
 
-    if (input === null) {
-  alert("👋 Game canceled. Thanks for playing!");
-  console.log("❌ Game was canceled by the user.");
-  return; // exit the game early
-}
+function playUIRound(playerSelection) {
+  if (gameOver) return;
 
-if (input.trim() === "") {
-  alert("⚠️ You must enter something. Try again.");
-  continue;
-}
+  const computerSelection = getComputerChoice();
+  const { result, message } = playSingleRound(playerSelection, computerSelection);
 
+  resultDiv.textContent = message;
 
-    const playerSelection = input.trim().toLowerCase();
+  if (result === "win") playerScore++;
+  else if (result === "lose") computerScore++;
 
-    if (!["rock", "paper", "scissors"].includes(playerSelection)) {
-      alert(" Invalid input! Only 'Rock', 'Paper', or 'Scissors' are allowed.");
-      continue; 
-    }
+  scoreDiv.textContent = `Score → You: ${playerScore} | AI: ${computerScore}`;
 
-    const computerSelection = getComputerChoice();
-    const { result, message } = playSingleRound(playerSelection, computerSelection);
-
-    console.log(` You chose: ${capitalize(playerSelection)}`);
-    console.log(` AI chose: ${capitalize(computerSelection)}`);
-    console.log(message);
-    console.log("--------------------------------------------------");
-
-    if (result === "win") playerScore++;
-    else if (result === "lose") computerScore++;
-
-    validRounds++;
+  if (playerScore === 5 || computerScore === 5) {
+    gameOver = true;
+    finalDiv.textContent = playerScore > computerScore
+      ? "🎉 You saved the world from the Evil AI"
+      : "🤖 The Evil AI has won. Earth falls to robots";
   }
-
- 
-  console.log(" Game finished");
-  console.log(` Final Score → You: ${playerScore} | AI: ${computerScore}`);
-
-  if (playerScore > computerScore) {
-    console.log(" Victory! You saved the world from the evil AI! 🎉");
-  } else if (playerScore < computerScore) {
-    console.log(" The evil AI has won. Earth falls under robotic rule… 🤖");
-  } else {
-    console.log(" It's a draw! The battle continues another day...");
-  }
-
-  alert(" Game Over!\nCheck the console (press F12) to see the full results.\nThanks for playing!");
 }
 
-game();
+function exitGame() {
+  gameOver = true;
+  finalDiv.textContent = "👋 You exited the game. Thanks for playing!";
+}
